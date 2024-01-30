@@ -1,0 +1,103 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ... (seu código atual) -->
+</head>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    select, input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .button-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+
+    #positionButton {
+      text-align: center;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+  </style>
+<body>
+    <h1>Configurações</h1>
+
+    <label for="diaSemana">Dia da Semana:</label>
+    <select id="diaSemana">
+        <option value="domingo">Domingo</option>
+        <option value="segunda">Segunda-feira</option>
+        <option value="terca">Terça-feira</option>
+        <option value="quarta">Quarta-feira</option>
+        <option value="quinta">Quinta-feira</option>
+        <option value="sexta">Sexta-feira</option>
+        <option value="sabado">Sábado</option>
+    </select>
+
+    <label for="horario">Horário:</label>
+    <input type="time" id="horario" />
+    <div id="positionButton">
+      <button onclick="salvarConfiguracoes()">Salvar Configurações</button>
+      <button onclick="window.location.href='/configuracoes'">Configurações do Banco de Dados</button>
+      <button onclick="window.location.href='/agendados'">Horários agendados</button>
+    </div>
+
+    <script>
+async function salvarConfiguracoes() {
+    const diaSemanaSelect = document.getElementById('diaSemana');
+    const diaSemana = diaSemanaSelect.options[diaSemanaSelect.selectedIndex].value;
+    const horario = document.getElementById('horario').value;
+
+    // Verifica se diaSemana e horario estão definidos antes de fazer a solicitação
+    if (diaSemana && horario) {
+        try {
+            // Envia uma solicitação POST para a rota /salvar-configuracoes
+            const response = await fetch('/salvar-configuracoes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ diaSemana, horario }),
+            });
+            console.log(JSON.stringify({ diaSemana, horario }));
+
+            // Exibe a resposta do servidor no console (pode ser útil para depurar)
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error('Erro ao fazer solicitação:', error);
+        }
+    } else {
+        console.error('Dia da semana ou horário não definidos.');
+    }
+}
+
+    </script>
+</body>
+</html>

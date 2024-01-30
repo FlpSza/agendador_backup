@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Configurações do Banco de Dados</title>
+</head>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: first baseline;
+    padding-left: 35%;
+    height: 50vh;
+    margin: 0;
+  }
+
+  h1 {
+    margin-bottom: 60px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  label {
+    margin-right: 10px;
+    min-width: 80px;
+  }
+
+  input {
+    flex: 1;
+    padding: 8px;
+    box-sizing: border-box;
+    width: 300px;
+  }
+
+  button {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+  }
+</style>
+<body>
+  <h1>Configurações do Banco de Dados</h1>
+  <label for="user">Usuário:</label>
+  <input type="text" id="user" placeholder="Digite o usuário"><br>
+
+  <label for="password">Senha:</label>
+  <input type="password" id="password" placeholder="Digite a senha"><br>
+
+  <label for="host">Host:</label>
+  <input type="text" id="host" placeholder="Digite o host"><br>
+
+  <label for="port">Porta:</label>
+  <input type="text" id="port" placeholder="Digite a porta"><br>
+
+  <label for="database">Banco de Dados:</label>
+  <input type="text" id="database" placeholder="Digite o nome do banco de dados"><br>
+
+  <button onclick="salvarConfiguracoesBanco()">Salvar Configurações do Banco de Dados</button>
+
+  <script>
+    window.onload = function() {
+      fetch('http://localhost:3000/config') // Substitua 3000 pela porta do seu servidor, se necessário
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('user').placeholder = data.user;
+           document.getElementById('password').placeholder = data.password;
+          document.getElementById('host').placeholder = data.host;
+          document.getElementById('port').placeholder = data.port;
+          document.getElementById('database').placeholder = data.database;
+        })
+        .catch(error => console.log('Erro ao carregar configurações:', error));
+    };
+
+    function salvarConfiguracoesBanco() {
+
+    }
+  </script>
+</body>
+</html>

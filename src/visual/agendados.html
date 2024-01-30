@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações de Agendamento</title>
+</head>
+<body>
+    <h1>Configurações de Agendamento</h1>
+
+    <label for="agendado">Selecione o Dia da Semana:</label>
+    <select id="agendado" onchange="buscarHorarioAgendado()">
+        <option value="selecionar">Selecionar</option>
+        <option value="domingo">Domingo</option>
+        <option value="segunda">Segunda-feira</option>
+        <option value="terca">Terça-feira</option>
+        <option value="quarta">Quarta-feira</option>
+        <option value="quinta">Quinta-feira</option>
+        <option value="sexta">Sexta-feira</option>
+        <option value="sabado">Sábado</option>
+    </select>
+
+    <p>Horário Agendado: <span id="horarioAgendado">N/A</span></p>
+
+    <!-- <button class="btn btn-primary btn-sm" onclick="modificarAgendamento()">Modificar</button> -->
+    <button class="btn btn-danger btn-sm" onclick="excluirAgendamento()">Excluir</button>
+
+    <script>
+    // Função para buscar e exibir o horário agendado
+    function buscarHorarioAgendado() {
+        // Obtém o elemento select
+        var select = document.getElementById("agendado");
+
+        // Obtém o valor selecionado (dia da semana)
+        var diaSelecionado = select.options[select.selectedIndex].value;
+
+        // Envia uma mensagem para o processo principal para buscar o horário agendado
+        window.ipc.send("buscar-horario-agendado", diaSelecionado);
+    }
+
+    // Função para receber e exibir o horário agendado
+    window.ipc.receive("horario-agendado", (horario) => {
+        // Obtém o elemento span
+        var span = document.getElementById("horarioAgendado");
+
+        // Atualiza o conteúdo do span com o horário agendado
+        span.innerText = horario;
+    });
+
+    function excluirAgendamento() {
+        // Obtém o elemento select
+        var select = document.getElementById("agendado");
+
+        // Obtém o valor selecionado (dia da semana)
+        var diaSelecionado = select.options[select.selectedIndex].value;
+
+        // Confirmação do usuário
+        var confirmacao = confirm("Tem certeza que deseja excluir o agendamento para " + diaSelecionado + "?");
+
+        // Verifica se o usuário clicou em "Cancelar"
+        if (!confirmacao) {
+            return;
+        }
+
+        // Envia uma mensagem para o processo principal para excluir o agendamento
+        window.ipc.send("excluir-agendamento", { diaSemana: diaSelecionado });
+    }
+    </script>
+    
+</body>
+</html>
