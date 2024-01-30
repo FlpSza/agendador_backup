@@ -67,7 +67,7 @@
 
   <script>
     window.onload = function() {
-      fetch('http://localhost:3000/config') // Substitua 3000 pela porta do seu servidor, se necessário
+      fetch('http://localhost:3000/config') 
         .then(response => response.json())
         .then(data => {
           document.getElementById('user').placeholder = data.user;
@@ -79,8 +79,27 @@
         .catch(error => console.log('Erro ao carregar configurações:', error));
     };
 
-    function salvarConfiguracoesBanco() {
+    async function salvarConfiguracoesBanco() {
+      const user = document.getElementById('user').value;
+      const password = document.getElementById('password').value;
+      const host = document.getElementById('host').value;
+      const port = document.getElementById('port').value;
+      const database = document.getElementById('database').value;
 
+      try {
+        const response = await fetch('http://localhost:3000/salvar-configuracoes-banco', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user, password, host, port, database }),
+        });
+
+        const result = await response.json();
+        console.log(result); // Exiba a resposta do servidor no console
+      } catch (error) {
+        console.error('Erro ao salvar configurações do banco de dados:', error);
+      }
     }
   </script>
 </body>

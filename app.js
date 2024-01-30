@@ -5,6 +5,7 @@ const { ipcMain, BrowserWindow } = electron;
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const { agendar, obterAgendamentos, excluirAgendamento, configurarBanco, salvarConfiguracoesNoBanco, abrirConfiguracoesDoBanco, abrirJanelaDeHorariosAgendados} = require('./src/functions/funcoes');
+const fs = require('fs')
 
 dotenv.config();
 const app = express();
@@ -31,6 +32,16 @@ app.get('/configuracoes', (req, res) => {
     res.sendFile(path.join(__dirname, 'src/visual/configuracoes.html'));
   });
 
+  //ROTA PARA ENVIAR DADOS DO .ENV PARA CONFIGURACOES.HTML
+app.get('/config', (req, res) => {
+  res.json({
+    user: process.env.USER,
+    host: process.env.HOST,
+    port: process.env.PORT,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE
+  });
+});
 
 
 
@@ -65,6 +76,34 @@ app.post('/salvar-configuracoes', async (req, res) => {
   
     res.sendFile(path.join(__dirname, 'src/visual/agendados.html'));
   });
+
+
+
+// Rota para salvar configurações no banco de dados
+app.post('/salvar-configuracoes-banco', (req, res) => {
+    try {
+      // Caminho para o arquivo .env
+      const envFilePath = path.join(__dirname, '.env');
+
+      // Recuperar os dados do corpo da requisição
+      const { user, password, host, port, database } = req.body;
+  
+      // Criar o conteúdo a ser salvo no arquivo .env
+      const envContent = `USER=${user}\nPASSWORD=${password}\nHOST=${host}\nPORT=${port}\nDATABASE=${database}`;
+  
+      // Salvar o conteúdo no arquivo .env
+      fs.writeFileSync(envFilePath, envContent, 'utf-8');
+  
+      // Responder ao cliente indicando sucesso
+      res.json({ message: 'Configurações do banco de dados salvas com sucesso' });
+    } catch (error) {
+      console.error('Erro ao salvar configurações no .env:', error);
+      // Responder ao cliente indicando erro
+      res.status(500).json({ error: 'Erro ao salvar configurações no .env' });
+    }
+  });
+
+
 
 
 
