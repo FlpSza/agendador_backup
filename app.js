@@ -1,10 +1,11 @@
 const express = require('express');
+const { Client } = require('pg');
 const path = require('path');
 const electron = require('electron');
 const { ipcMain, BrowserWindow } = electron;
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const { agendar, obterAgendamentos, excluirAgendamento, configurarBanco, salvarConfiguracoesNoBanco, abrirConfiguracoesDoBanco, abrirJanelaDeHorariosAgendados} = require('./src/functions/funcoes');
+const { agendar, obterAgendamentos, excluirAgendamento, configurarBanco, salvarConfiguracoesNoBanco, abrirConfiguracoesDoBanco, abrirJanelaDeHorariosAgendados, verificarAgendamentoExistente} = require('./src/functions/funcoes');
 const fs = require('fs')
 
 dotenv.config();
@@ -103,7 +104,47 @@ app.post('/salvar-configuracoes-banco', (req, res) => {
     }
   });
 
+//rota para verificar agendamento
+app.get('/verificar-agendamento/:dia', async (req, res) => {
+    const dia = req.params.dia;
 
+    try {
+        const agendamentoExistente = await verificarAgendamentoExistente(dia);
+        res.json(agendamentoExistente);
+    } catch (error) {
+        console.error('Erro ao verificar agendamento existente:', error);
+        res.status(500).json({ error: 'Erro ao verificar agendamento existente.' });
+    }
+});
+
+// Rota para excluir um agendamento
+app.delete('/excluir-agendamento/:diaSemana', async (req, res) => {
+    const { diaSemana } = req.params;
+
+    const client = new Client({
+        user: process.env.USER,
+        host: process.env.HOST,
+        database: process.env.DATABASE,
+        password: process.env.PASSWORD,
+        port: process.env.PORT,
+    });
+
+    try {
+        await client.connect();
+
+        const query = 'DELETE FROM agendamentos WHERE dia = $1';
+        const values = [diaSemana];
+
+        await client.query(query, values);
+
+        res.status(200).json({ message: 'Agendamento excluído com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao excluir agendamento:', error);
+        res.status(500).json({ error: 'Erro interno ao excluir agendamento.' });
+    } finally {
+        await client.end();
+    }
+});
 
 
 

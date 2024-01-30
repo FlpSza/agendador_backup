@@ -25,48 +25,73 @@
 
     <!-- <button class="btn btn-primary btn-sm" onclick="modificarAgendamento()">Modificar</button> -->
     <button class="btn btn-danger btn-sm" onclick="excluirAgendamento()">Excluir</button>
-
     <script>
-    // Função para buscar e exibir o horário agendado
-    function buscarHorarioAgendado() {
-        // Obtém o elemento select
-        var select = document.getElementById("agendado");
+// Função para buscar e exibir o horário agendado
+// agendamentos.html
+async function buscarHorarioAgendado() {
+    const diaSemanaSelect = document.getElementById('agendado');
+    const horarioAgendadoSpan = document.getElementById('horarioAgendado');
 
-        // Obtém o valor selecionado (dia da semana)
-        var diaSelecionado = select.options[select.selectedIndex].value;
+    if (diaSemanaSelect && horarioAgendadoSpan) {
+        const diaSemana = diaSemanaSelect.options[diaSemanaSelect.selectedIndex].value;
 
-        // Envia uma mensagem para o processo principal para buscar o horário agendado
-        window.ipc.send("buscar-horario-agendado", diaSelecionado);
-    }
-
-    // Função para receber e exibir o horário agendado
-    window.ipc.receive("horario-agendado", (horario) => {
-        // Obtém o elemento span
-        var span = document.getElementById("horarioAgendado");
-
-        // Atualiza o conteúdo do span com o horário agendado
-        span.innerText = horario;
-    });
-
-    function excluirAgendamento() {
-        // Obtém o elemento select
-        var select = document.getElementById("agendado");
-
-        // Obtém o valor selecionado (dia da semana)
-        var diaSelecionado = select.options[select.selectedIndex].value;
-
-        // Confirmação do usuário
-        var confirmacao = confirm("Tem certeza que deseja excluir o agendamento para " + diaSelecionado + "?");
-
-        // Verifica se o usuário clicou em "Cancelar"
-        if (!confirmacao) {
+        if (diaSemana === 'selecionar') {
+            // Se o usuário selecionar "Selecionar", exibe 'N/A'
+            horarioAgendadoSpan.textContent = 'N/A';
             return;
         }
 
-        // Envia uma mensagem para o processo principal para excluir o agendamento
-        window.ipc.send("excluir-agendamento", { diaSemana: diaSelecionado });
+        try {
+            const response = await fetch(`http://localhost:3000/verificar-agendamento/${diaSemana}`);
+            const agendamentoExistente = await response.json();
+
+            if (agendamentoExistente) {
+                // Atualiza o conteúdo do elemento com o horário agendado
+                horarioAgendadoSpan.textContent = agendamentoExistente.horario;
+            } else {
+                // Se não houver agendamento, exibe 'N/A'
+                horarioAgendadoSpan.textContent = 'N/A';
+            }
+        } catch (error) {
+            console.error('Erro ao buscar horário agendado:', error);
+        }
+    } else {
+        console.error('Elemento com ID "diaSemana" ou "horarioAgendado" não encontrado.');
     }
-    </script>
+}
+
+async function excluirAgendamento() {
+    const diaSemanaSelect = document.getElementById('agendado');
+
+    if (diaSemanaSelect) {
+        const diaSemana = diaSemanaSelect.options[diaSemanaSelect.selectedIndex].value;
+
+        if (diaSemana === 'selecionar') {
+            alert('Selecione um dia antes de excluir.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/excluir-agendamento/${diaSemana}`, {
+                method: 'DELETE',
+            });
+
+            const data = await response.json();
+
+            // Exibe a mensagem recebida do servidor
+            alert(data.message);
+
+            // Atualiza o conteúdo do elemento com o horário agendado para 'N/A'
+            document.getElementById('horarioAgendado').textContent = 'N/A';
+        } catch (error) {
+            console.error('Erro ao excluir agendamento:', error);
+        }
+    } else {
+        console.error('Elemento com ID "diaSemana" não encontrado.');
+    }
+}
+
+</script>
     
 </body>
 </html>

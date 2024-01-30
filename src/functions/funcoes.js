@@ -227,6 +227,22 @@ async function criarAgendamento(configuracoes) {
     }
 }
 
+function excluirAgendamento() {
+  var select = document.getElementById("agendado");
+  var diaSelecionado = select.options[select.selectedIndex].value;
+
+  fetch(`/excluir-agendamento/${diaSelecionado}`, {
+      method: 'DELETE',
+  })
+  .then(response => response.json())
+  .then(data => {
+      console.log(data);
+      // Aqui você pode lidar com a resposta do servidor, se necessário
+  })
+  .catch(error => {
+      console.error('Erro ao excluir agendamento:', error);
+  });
+}
 
 
 
@@ -501,4 +517,5 @@ module.exports = {
   salvarConfiguracoesNoBanco,
   abrirConfiguracoesDoBanco,
   abrirJanelaDeHorariosAgendados,
+  excluirAgendamento,
 };
