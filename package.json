@@ -13,7 +13,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "node app.js"
+    "test": "node app.js",
+    "start": "nodemon -e js,json,env app.js"
   },
   "keywords": [],
   "author": "",
