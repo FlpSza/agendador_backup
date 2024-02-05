@@ -147,26 +147,6 @@ app.delete('/excluir-agendamento/:diaSemana', async (req, res) => {
 });
 
 
-
-
-//Agendar dia
-app.post('/agendar', (req, res) => {
-  res.redirect('/');
-});
-//Excluir dia
-app.post('/excluir', (req, res) => {
-  // Implemente a lógica para excluir um agendamento
-  // Exemplo: excluirAgendamento(req.body.id);
-  res.redirect('/agendados');
-});
-
-//Salvar configuracao do banco
-app.post('/configurar-banco', (req, res) => {
-  // Implemente a lógica para configurar o banco de dados
-  // Exemplo: configurarBanco(req.body.host, req.body.usuario, req.body.senha, req.body.banco);
-  res.redirect('/');
-});
-
 app.listen(PORT, () => {
   console.log(`Servidor iniciado na porta ${PORT}`);
 });
